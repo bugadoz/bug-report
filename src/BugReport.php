@@ -5,6 +5,7 @@ class BugReport
 {
     private $apiKey;
     private $storagePath;
+    private $apiEndpoint = 'https://bugadoz.dev/api/report';
 
     public function __construct(string $apiKey, string $storagePath)
     {
@@ -27,9 +28,45 @@ class BugReport
         $destination = $this->storagePath . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $destination)) {
-            return $filename;
+            return $destination;
         }
 
         return null;
+    }
+
+    /**
+     * Envia os dados do bug para a API central
+     * 
+     * @param array $dados Ex: ['descricao' => '', 'url' => '', 'navegador' => '', 'sistema' => '']
+     * @param string|null $caminhoArquivo Caminho para imagem ou vídeo salvo
+     * @return string|false Resposta da API
+     */
+    public function reportBug(array $dados, ?string $caminhoArquivo = null)
+    {
+        $post = [
+            'api_key'   => $this->apiKey,
+            'descricao' => $dados['descricao'] ?? '',
+            'url'       => $dados['url'] ?? '',
+            'navegador' => $dados['navegador'] ?? $_SERVER['HTTP_USER_AGENT'] ?? '',
+            'sistema'   => $dados['sistema'] ?? PHP_OS,
+        ];
+
+        // Se houver arquivo, inclui no POST
+        if ($caminhoArquivo && file_exists($caminhoArquivo)) {
+            $post['arquivo'] = new \CURLFile($caminhoArquivo);
+        }
+
+        $ch = curl_init($this->apiEndpoint);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $resposta = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            return false;
+        }
+
+        curl_close($ch);
+        return $resposta;
     }
 }
