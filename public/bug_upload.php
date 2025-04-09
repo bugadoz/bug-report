@@ -1,13 +1,15 @@
 <?php
-require_once __DIR__ . '/../src/BugReport.php';
-
 use Bugadoz\BugReport;
 
-$report = new BugReport('SUA_API_KEY', __DIR__ . '/../uploads');
+$bug = new BugReport('SUA_API_KEY', __DIR__ . '/temp/');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-    $saved = $report->saveFile($_FILES['file']);
-    echo json_encode(['status' => $saved ? 'success' : 'error', 'file' => $saved]);
-} else {
-    echo json_encode(['status' => 'no_file']);
-}
+// Simulando um arquivo do $_FILES:
+$arquivoSalvo = $bug->saveFile($_FILES['screenshot'] ?? []);
+
+$resposta = $bug->reportBug([
+    'descricao' => 'Erro ao clicar em "Enviar"',
+    'url' => 'https://meusite.com/formulario'
+], $arquivoSalvo);
+
+echo $resposta;
+
