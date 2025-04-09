@@ -1,0 +1,14 @@
+{
+  "name": "bugadoz/bug-report",
+  "description": "Biblioteca PHP para reportar bugs com vídeo e imagem diretamente do navegador.",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Bugadoz\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=7.4"
+  }
+}
