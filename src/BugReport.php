@@ -5,7 +5,7 @@ class BugReport
 {
     private $apiKey;
     private $storagePath;
-    private $apiEndpoint = 'https://bugadoz.dev/api/report';
+    private $apiEndpoint = 'https://bugadoz.dev/report';
 
     public function __construct(string $apiKey, string $storagePath)
     {
