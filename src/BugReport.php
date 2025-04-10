@@ -35,6 +35,17 @@ class BugReport
     }
 
     /**
+     * Gera a URL atual completa (protocolo + domínio + URI)
+     */
+    private function getCurrentUrl(): string
+    {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443
+            ? "https://" : "http://";
+
+        return $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    /**
      * Envia os dados do bug para a API central
      * 
      * @param array $dados Ex: ['descricao' => '', 'url' => '', 'navegador' => '', 'sistema' => '']
@@ -46,7 +57,7 @@ class BugReport
         $post = [
             'api_key'   => $this->apiKey,
             'descricao' => $dados['descricao'] ?? '',
-            'url'       => $dados['url'] ?? '',
+            'url'       => $dados['url'] ?? $this->getCurrentUrl(), // <- Aqui pegamos a URL atual se não for fornecida
             'navegador' => $dados['navegador'] ?? $_SERVER['HTTP_USER_AGENT'] ?? '',
             'sistema'   => $dados['sistema'] ?? PHP_OS,
         ];
