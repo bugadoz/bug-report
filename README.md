@@ -1,93 +1,89 @@
-# 📦 bugadoz-php-sdk
 
-SDK oficial do [bugadoz.dev](https://bugadoz.dev) — envie logs e relatórios de erros automaticamente do seu projeto PHP com uma única linha de código.
+# 🐞 Bugadoz - BugReport PHP
 
-> Geração de gráficos, relatórios, estatísticas e colaboração com a comunidade de desenvolvedores em tempo real.
-
----
-
-## 🚀 Instalação
-
-Instale via Composer:
-
-```bash
-composer require bugadoz/sdk
-
+Relate automaticamente erros do seu sistema PHP com envio para a plataforma [bugadoz.dev](https://bugadoz.dev). Esta biblioteca permite capturar e reportar erros com facilidade e organização.
 
 ---
 
-🔐 Privacidade dos Logs
+## ⚙️ Como usar
 
-A SDK permite definir o nível de privacidade dos relatórios:
+### Instalação
 
-Você define isso no segundo parâmetro do construtor:
+Você pode incluir a classe manualmente ou usar um autoloader compatível com PSR-4.
 
-$bug = new BugReport('SUA_API_KEY', 'private');
-
-
----
-
-✨ Como Usar
-
+```php
+require_once 'BugReport.php'; // Ou use um autoloader
 use Bugadoz\BugReport;
+```
 
-// Inicialização com chave da API e privacidade (opcional)
-$bug = new BugReport('SUA_API_KEY', 'public');
+### Exemplo de uso
 
-// Envio do log
-$resposta = $bug->reportBug([
-    'descricao' => 'Erro ao carregar usuários na dashboard',
-    // Parâmetros opcionais abaixo:
-    // 'url' => 'https://meusite.com/dashboard',
-    // 'navegador' => $_SERVER['HTTP_USER_AGENT'],
-    // 'sistema' => PHP_OS
+```php
+$bug = new BugReport('SUA_API_KEY', 'public', 'feedback');
+
+// Reportando um bug manualmente
+$bug->reportBug([
+    'descricao' => 'Erro ao salvar usuário',
 ]);
 
-if ($resposta) {
-    echo "Log enviado com sucesso!";
-} else {
-    echo "Falha ao enviar log.";
-}
-
+// Captura automática de erros, exceções e fatal errors
+$bug->inicializarCapturaAutomatica();
+```
 
 ---
 
-📋 Parâmetros Aceitos
+## 📥 Parâmetros Aceitos
 
+### `__construct(string $apiKey, string $privacy, string $type)`
 
----
-
-🛠 Requisitos
-
-PHP 8.0 ou superior
-
-Extensão cURL habilitada
-
-
+| Parâmetro   | Tipo   | Obrigatório | Descrição |
+|-------------|--------|-------------|-----------|
+| `apiKey`    | string | ✅ Sim      | Sua chave de autenticação gerada no painel da [bugadoz.dev](https://bugadoz.dev). |
+| `privacy`   | string | ✅ Sim      | Define se o relatório de erro será público ou privado. Valores aceitos: `public` ou `private`. |
+| `type`      | string | ✅ Sim      | Define o nível de visibilidade do caminho do arquivo no relatório. <br>Valores aceitos: `onlyme`, `feedback` ou `test`. |
 
 ---
 
-📈 Funcionalidades
+### 🔐 Detalhes dos Parâmetros
 
-Envio automático de logs para bugadoz.dev
+#### 🔑 apiKey
+Sua chave única de autenticação com a API da bugadoz.dev. É obrigatória para enviar qualquer relatório.
 
-Integração com relatórios e gráficos da plataforma
+#### 🕶️ privacy
+Define se o erro reportado poderá ser visualizado publicamente:
+- `public` – Qualquer pessoa poderá visualizar o erro.
+- `private` – Apenas você terá acesso ao erro no painel.
 
-Suporte a três níveis de visibilidade (público, privado, teste)
-
-Captura automática de dados como URL, sistema e navegador
-
-Ideal para sistemas web, APIs e dashboards internos
-
-
-
----
-
-📄 Licença
-
-MIT — Livre para usar, modificar e distribuir.
-
+#### 📂 type
+Define quem poderá ver o **caminho do arquivo** que gerou o erro:
+- `onlyme` – Apenas você poderá ver os caminhos dos arquivos (modo mais seguro).
+- `feedback` – Caminhos são visíveis publicamente (para relatórios colaborativos).
+- `test` – Modo de testes, pode ser usado em ambientes de desenvolvimento.
 
 ---
 
-Feito com 💙 pela equipe bugadoz.dev
+## 🧪 Captura Automática de Erros
+
+Use `inicializarCapturaAutomatica()` para ativar o envio automático de:
+- Erros (`set_error_handler`)
+- Exceções (`set_exception_handler`)
+- Fatal errors (`register_shutdown_function`)
+
+```php
+$bug->inicializarCapturaAutomatica();
+```
+
+---
+
+## 📁 Armazenamento local de erros
+
+Os erros são salvos automaticamente em arquivos `.txt` dentro da pasta `erros/`, caso não seja possível enviá-los para a API.
+
+---
+
+## 📬 Suporte
+
+Acesse [https://bugadoz.dev](https://bugadoz.dev) para:
+- Gerar sua API Key
+- Acompanhar seus relatórios
+- Compartilhar bugs com sua equipe
