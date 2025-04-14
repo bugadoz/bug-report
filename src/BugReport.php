@@ -6,13 +6,29 @@ class BugReport
 {
     private string $apiKey;
     private string $privacy;
-    private string $apiEndpoint = 'https://bugadoz.dev/report';
+    private string $apiEndpoint = 'https://bugadoz.dev/bugreport';
+    private string $type;
 
-    public function __construct(string $apiKey, ?string $privacy = 'public')
-    {
-        $this->apiKey = $apiKey;
-        $this->privacy = in_array($privacy, ['public', 'private', 'test']) ? $privacy : 'public';
+   public function __construct(string $apiKey, string $privacy, string $type)
+{
+    $this->apiKey = $apiKey;
+
+    $validPrivacy = ['public', 'private'];
+    $validType = ['onlyme', 'test', 'feedback'];
+
+    if (!in_array($privacy, $validPrivacy)) {
+        throw new \InvalidArgumentException("Valor inválido para privacy: '$privacy'. Use 'public' ou 'private'.");
     }
+
+    if (!in_array($type, $validType)) {
+        throw new \InvalidArgumentException("Valor inválido para type: '$type'. Use 'onlyme', 'test' ou 'feedback'.");
+    }
+
+    $this->privacy = $privacy;
+    $this->type = $type;
+}
+
+
 
     private function getCurrentUrl(): string
     {
@@ -31,6 +47,8 @@ class BugReport
             'navegador' => $dados['navegador'] ?? ($_SERVER['HTTP_USER_AGENT'] ?? 'Desconhecido'),
             'sistema'   => $dados['sistema'] ?? PHP_OS,
             'privacy'   => $this->privacy,
+            'type'   => $this->type
+            
         ];
 
         $ch = curl_init($this->apiEndpoint);
